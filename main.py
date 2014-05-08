@@ -24,7 +24,7 @@ template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
 			       autoescape = True)
 
-class Handler(webapp2.RequestHandler):
+class BlogHandler(webapp2.RequestHandler):
     def write(self, *a, **kw):
 	self.response.out.write(*a, **kw)
 
@@ -40,13 +40,13 @@ class Post(db.Model):
     content = db.TextProperty(required = True)
     created = db.DateTimeProperty(auto_now_add = True)
 
-class Permalink(Handler):
+class Permalink(BlogHandler):
     def get(self, post_id):
 	print post_id
 	post = Post.get_by_id(int(post_id))
 	self.render("front.html", posts=[post])
 
-class NewPostHandler(Handler):
+class NewPostHandler(BlogHandler):
     def render_newpost(self, subject="", content="", error=""):
 	self.render("newpost.html", subject=subject, content=content, error=error)
   
@@ -66,7 +66,7 @@ class NewPostHandler(Handler):
 	    error = "subject and content, please!"
 	    self.render_newpost(subject, content, error)
 
-class MainPage(Handler):  
+class MainPage(BlogHandler):  
     def render_latestposts(self, posts=""):
 	self.render("front.html", posts=posts)
 
