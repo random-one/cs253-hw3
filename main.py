@@ -35,6 +35,9 @@ class BlogHandler(webapp2.RequestHandler):
     def render(self, template, **kw):
 	self.write(self.render_str(template, **kw))
 
+def blog_key(name = 'default'):
+    return db.Key.from_path('blogs', name)
+
 class Post(db.Model):
     subject = db.StringProperty(required = True)
     content = db.TextProperty(required = True)
