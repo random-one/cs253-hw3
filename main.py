@@ -51,6 +51,11 @@ class Post(db.Model):
 	self._render_text = self.content.replace('\n', '<br>')
 	return render_str("post.html", p = self)
 
+class BlogFront(BlogHandler):
+    def get(self):
+	posts = db.GqlQuery("SELECT * FROM Post ORDER BY created DESC LIMIT 10")
+	self.render("front.html", posts = posts)
+
 class Permalink(BlogHandler):
     def get(self, post_id):
 	print post_id
@@ -85,7 +90,7 @@ class MainPage(BlogHandler):
 	posts = db.GqlQuery("SELECT * FROM Post ORDER BY created DESC LIMIT 10")
 	self.render_latestposts(posts)
 
-app = webapp2.WSGIApplication([('/blog', MainPage),
+app = webapp2.WSGIApplication([('/blog/?', BlogFront),
 			       ('/blog/newpost', NewPost),
 			       (r'/blog/(\d+)', Permalink)],
 				debug=True)
