@@ -57,10 +57,10 @@ class Permalink(BlogHandler):
 	post = Post.get_by_id(int(post_id))
 	self.render("front.html", posts=[post])
 
-class NewPostHandler(BlogHandler):
     def render_newpost(self, subject="", content="", error=""):
 	self.render("newpost.html", subject=subject, content=content, error=error)
   
+class NewPost(BlogHandler):
     def get(self):
 	self.render_newpost()
 
@@ -86,6 +86,6 @@ class MainPage(BlogHandler):
 	self.render_latestposts(posts)
 
 app = webapp2.WSGIApplication([('/blog', MainPage),
-			       ('/blog/newpost', NewPostHandler),
+			       ('/blog/newpost', NewPost),
 			       (r'/blog/(\d+)', Permalink)],
 				debug=True)
