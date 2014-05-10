@@ -58,37 +58,29 @@ class BlogFront(BlogHandler):
 
 class Permalink(BlogHandler):
     def get(self, post_id):
-	print post_id
-	post = Post.get_by_id(int(post_id))
-	self.render("front.html", posts=[post])
+	key = db.Key.from_path('Post', int(post_id), parent = blog_key())
+	post = db.get(key)
+	if not post:
+	    self.error(404)
+	    return
+	
+	self.render("permalink.html", post = post)
 
-    def render_newpost(self, subject="", content="", error=""):
-	self.render("newpost.html", subject=subject, content=content, error=error)
-  
 class NewPost(BlogHandler):
     def get(self):
-	self.render_newpost()
+	self.render("newpost.html")
 
     def post(self):
 	subject = self.request.get("subject")
 	content = self.request.get("content")
 	
 	if subject and content:
-	    post = Post(subject=subject, content=content)
+	    post = Post(parent = blog_key(), subject = subject, content = content)
 	    key = post.put()
-	    print int(post.key().id())
-	    self.redirect("/blog/%s" % post.key().id())
+	    self.redirect("/blog/%s" % str(post.key().id()))
 	else:
 	    error = "subject and content, please!"
-	    self.render_newpost(subject, content, error)
-
-class MainPage(BlogHandler):  
-    def render_latestposts(self, posts=""):
-	self.render("front.html", posts=posts)
-
-    def get(self):
-	posts = db.GqlQuery("SELECT * FROM Post ORDER BY created DESC LIMIT 10")
-	self.render_latestposts(posts)
+	    self.render("newpost.html", subject = subject, content = content , error = error)
 
 app = webapp2.WSGIApplication([('/blog/?', BlogFront),
 			       ('/blog/newpost', NewPost),
